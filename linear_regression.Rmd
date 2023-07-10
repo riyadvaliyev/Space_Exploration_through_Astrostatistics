@@ -1,0 +1,48 @@
+---
+title: "question3"
+output: html_document
+date: "2023-03-19"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(arrow)
+setwd("C:/Users/Chloe/Desktop/galaxy_zoo")
+df2 <- read_parquet("C:/Users/Chloe/Desktop/galaxy_zoo/nsa_v1_0_1_key_cols.parquet")
+df2 <- df2 %>% filter(!is.na(elpetro_absmag_r))%>%filter(!is.infinite(elpetro_absmag_r))
+df2 <- df2 %>% filter(!is.na(redshift))%>%filter(!is.infinite(redshift))
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+glimpse(df2)
+```
+
+## Including Plots
+```{r,warning=FALSE}
+df2 %>% ggplot(aes(x=redshift)) + geom_histogram(fill = "grey", colour = "black") 
+df2 %>% ggplot(aes(x=elpetro_absmag_r)) + geom_histogram(fill = "grey", colour = "black") 
+```
+For histogram:
+
+the histogram of redshift is unimodal approximately symmetric with a slight tendency towards the right side. The majority of the stars form this data set is between 0.07-0.075, which is in the midddle of the range.
+the histogram of brightness is unimodal approximately symmetric with a slight tendency towards the left side. The majority of the stars form this data set is between -18.75 to -20, which is in the middle of the range.
+Both histogram have similar shape, it seems like they might have some relationship, but only analysis histogram can not tell that, we need to use linear regression model to see if the brightness and distance have a certain correlation.
+
+You can also embed plots, for example:
+
+```{r,warning=FALSE}
+df2 %>% ggplot(aes(redshift, elpetro_absmag_r)) + geom_point()+ geom_smooth(se=FALSE, method="lm") + theme_minimal()
+```
+```{r,warning=FALSE}
+mod <- lm(elpetro_absmag_r ~ redshift, data = df2)
+summary(mod)$coefficients
+
+```
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
